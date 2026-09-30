@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مدیریت نیرو - سالن بسته‌بندی سیمرغ</title>
+    <!-- Custom SVG Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d97706'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/></svg>">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Vazirmatn Font -->
@@ -18,7 +20,12 @@
     <div id="loginScreen" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 border border-slate-100">
             <div class="text-center mb-5">
-                <div class="bg-amber-500 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2 text-xl font-bold shadow-md shadow-amber-500/30">🏭</div>
+                <!-- Login Logo Icon -->
+                <div class="bg-amber-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-amber-500/30">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                </div>
                 <h1 class="text-xl font-bold text-slate-900">سیستم مدیریت نیرو</h1>
                 <p class="text-xs text-slate-500 mt-0.5">سالن بسته‌بندی سیمرغ</p>
             </div>
@@ -60,7 +67,7 @@
                         <option value="دستگاه پکر ۳">دستگاه پکر ۳</option>
                         <option value="دستگاه پکر ۴">دستگاه پکر ۴</option>
                         <option value="سایش">سایش</option>
-                        <option value="زرده‌گیری">زرده‌گیری</option>
+                        <option value="زرده‌‌گیری">زرده‌گیری</option>
                     </select>
                 </div>
                 <div>
@@ -69,7 +76,7 @@
                         <option value="شنبه">شنبه</option>
                         <option value="یکشنبه">یکشنبه</option>
                         <option value="دوشنبه">دوشنبه</option>
-                        <option value="سه‌شنبه">سه‌شنبه</option>
+                        <option value="سه‌‌شنبه">سه‌شنبه</option>
                         <option value="چهارشنبه">چهارشنبه</option>
                         <option value="پنج‌شنبه">پنج‌شنبه</option>
                         <option value="جمعه">جمعه</option>
@@ -89,7 +96,12 @@
         <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-30">
             <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap justify-between items-center gap-2">
                 <div class="flex items-center space-x-2.5 space-x-reverse">
-                    <div class="bg-amber-500 text-white p-1.5 rounded-lg font-bold text-base">🏭</div>
+                    <!-- Header Branded Logo Icon -->
+                    <div class="bg-amber-600 text-white p-2 rounded-xl flex items-center justify-center shadow-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                    </div>
                     <div>
                         <h2 class="font-bold text-sm text-slate-800">مدیریت نیرو - سیمرغ</h2>
                         <p class="text-[10px] text-slate-500">پنل عملیاتی سالن بسته‌بندی</p>
@@ -107,7 +119,7 @@
             <div class="max-w-7xl mx-auto px-4 flex space-x-1.5 space-x-reverse border-t border-slate-100 overflow-x-auto text-xs">
                 <button onclick="switchTab('dashboard')" id="btn-dashboard" class="tab-btn px-3 py-2.5 font-medium border-b-2 border-amber-600 text-amber-600 whitespace-nowrap">📊 داشبورد</button>
                 <button onclick="switchTab('daily')" id="btn-daily" class="tab-btn px-3 py-2.5 font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 whitespace-nowrap">📅 برنامه روزانه (<span id="tabDayName">...</span>)</button>
-                <button onclick="switchTab('personnel')" id="btn-personnel" class="tab-btn px-3 py-2.5 font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 whitespace-nowrap">👥 لیست نیروها</button>
+                <button onclick="switchTab('personnel')" id="btn-personnel" class="tab-btn px-3 py-2.5 font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 whitespace-nowrap">👥 لیست نیروها (۴۰ نفر)</button>
                 <button onclick="switchTab('notes')" id="btn-notes" class="tab-btn px-3 py-2.5 font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 whitespace-nowrap">📝 یادداشت‌ها</button>
             </div>
         </header>
