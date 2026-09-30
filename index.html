@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت نیرو - سالن بسته‌بندی سیمرغ</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Vazirmatn Font -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        body { font-family: 'Vazirmatn', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col text-sm">
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 border border-slate-100">
+            <div class="text-center mb-5">
+                <div class="bg-amber-500 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2 text-xl font-bold shadow-md shadow-amber-500/30">🏭</div>
+                <h1 class="text-xl font-bold text-slate-900">سیستم مدیریت نیرو</h1>
+                <p class="text-xs text-slate-500 mt-0.5">سالن بسته‌بندی سیمرغ</p>
+            </div>
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">نام کاربری (ایمیل)</label>
+                    <input type="email" id="username" required class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-500 outline-none text-xs" placeholder="amin.se7en92@gmail.com">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">رمز عبور</label>
+                    <input type="password" id="password" required class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-500 outline-none text-xs" placeholder="••••••••">
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="checkbox" id="rememberMe" checked class="w-3.5 h-3.5 rounded text-amber-600 focus:ring-amber-500 border-slate-300">
+                        <span class="text-slate-600">من رو به خاطر بسپار</span>
+                    </label>
+                </div>
+                <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2.5 rounded-lg shadow transition text-sm">ورود به سامانه</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Personnel Modal -->
+    <div id="editModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-sm p-5 space-y-4">
+            <h3 class="font-bold text-sm text-slate-800 border-b pb-2">✏️ ویرایش مشخصات نیرو</h3>
+            <form onsubmit="savePersonnelEdit(event)" class="space-y-3">
+                <input type="hidden" id="editPersonId">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">نام پرسنل</label>
+                    <input type="text" id="editPersonName" required class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs outline-none bg-white focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">محل کار (بخش)</label>
+                    <select id="editPersonSection" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs outline-none bg-white">
+                        <option value="دستگاه پکر ۱">دستگاه پکر ۱</option>
+                        <option value="دستگاه پکر ۲">دستگاه پکر ۲</option>
+                        <option value="دستگاه پکر ۳">دستگاه پکر ۳</option>
+                        <option value="دستگاه پکر ۴">دستگاه پکر ۴</option>
+                        <option value="سایش">سایش</option>
+                        <option value="زرده‌گیری">زرده‌گیری</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">روز استراحت (آف)</label>
+                    <select id="editPersonOffDay" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs outline-none bg-white">
+                        <option value="شنبه">شنبه</option>
+                        <option value="یکشنبه">یکشنبه</option>
+                        <option value="دوشنبه">دوشنبه</option>
+                        <option value="سه‌شنبه">سه‌شنبه</option>
+                        <option value="چهارشنبه">چهارشنبه</option>
+                        <option value="پنج‌شنبه">پنج‌شنبه</option>
+                        <option value="جمعه">جمعه</option>
+                    </select>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded-lg text-xs transition">ذخیره تغییرات</button>
+                    <button type="button" onclick="closeEditModal()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2 rounded-lg text-xs transition">انصراف</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="appContainer" class="hidden flex-col min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-30">
+            <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap justify-between items-center gap-2">
+                <div class="flex items-center space-x-2.5 space-x-reverse">
+                    <div class="bg-amber-500 text-white p-1.5 rounded-lg font-bold text-base">🏭</div>
+                    <div>
+                        <h2 class="font-bold text-sm text-slate-800">مدیریت نیرو - سیمرغ</h2>
+                        <p class="text-[10px] text-slate-500">پنل عملیاتی سالن بسته‌بندی</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="text-left bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200">
+                        <div id="tehranTime" class="text-xs font-bold text-amber-600">--:--:--</div>
+                        <div id="currentDate" class="text-[10px] text-slate-500">بارگذاری تاریخ...</div>
+                    </div>
+                    <button onclick="handleLogout()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-2.5 py-1.5 rounded-lg text-xs font-medium transition" title="خروج">🚪 خروج</button>
+                </div>
+            </div>
+            <!-- Navigation Tabs -->
+            <div class="max-w-7xl mx-auto px-4 flex space-x-1.5 space-x-reverse border-t border-slate-100 overflow-x-auto text-xs">
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="tab-btn px-3 py-2.5 font-medium border-b-2 border-amber-600 text-amber-600 whitespace-nowrap">📊 داشبورد</button>
+                <button onclick="switchTab('daily')" id="btn-daily" class="tab-btn px-3 py-2.5 font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 whitespace-nowrap">📅 برنامه روزانه (<span id="tabDayName">...</span>)</button>
+                <button onclick="switchTab('personnel')" id="btn-personnel" class="tab-btn px-3 py-2.5 font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 whitespace-nowrap">👥 لیست نیروها</button>
+                <button onclick="switchTab('notes')" id="btn-notes" class="tab-btn px-3 py-2.5 font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 whitespace-nowrap">📝 یادداشت‌ها</button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-grow max-w-7xl w-full mx-auto p-3 md:p-4">
+
+            <!-- TAB 1: Dashboard -->
+            <div id="tab-dashboard" class="space-y-4">
+                <!-- Today / Tomorrow Toggle Bar -->
+                <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-800">وضعیت استراحت پرسنل</h3>
+                        <p class="text-[10px] text-slate-500">بررسی نیروهای آف امروز و فردا</p>
+                    </div>
+                    <div class="flex gap-1.5">
+                        <button onclick="setDashboardMode('today')" id="modeBtnToday" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition bg-amber-600 text-white shadow-sm">📅 امروز (<span id="todayLabelName">...</span>)</button>
+                        <button onclick="setDashboardMode('tomorrow')" id="modeBtnTomorrow" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200">⏳ فردا (<span id="tomorrowLabelName">...</span>)</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <!-- Rest Personnel (Off) List for Selected Mode -->
+                    <div class="lg:col-span-2 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100">
+                            <h3 class="font-bold text-sm text-slate-800">☕ پرسنل استراحت <span id="activeModeTitle" class="text-amber-600">امروز</span> (<span id="activeDayNameTitle" class="text-amber-600">...</span>)</h3>
+                            <span id="offCountBadge" class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">۰ نفر</span>
+                        </div>
+                        <div id="offPersonnelList" class="space-y-2 max-h-[420px] overflow-y-auto pl-1">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Tomorrow's Personnel Summary Section -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-3">
+                        <div class="pb-2 border-b border-slate-100">
+                            <h3 class="font-bold text-sm text-slate-800">👥 نیروهای فردا</h3>
+                            <p class="text-[10px] text-slate-400">وضعیت روز آینده (<span id="tomorrowDaySubTitle" class="text-amber-600 font-medium">...</span>)</p>
+                        </div>
+
+                        <div>
+                            <h4 class="text-[10px] font-bold text-amber-600 mb-1.5 uppercase tracking-wider">● آف شیفت فردا</h4>
+                            <div id="tomorrowOffSummaryList" class="space-y-1.5 max-h-[180px] overflow-y-auto pl-1">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-100">
+                            <h4 class="text-[10px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">● تعداد کل حاضرین فردا</h4>
+                            <div class="p-2 bg-slate-50 rounded-lg border border-slate-200 text-xs flex justify-between items-center">
+                                <span class="text-slate-600">نیروی فعال در شیفت:</span>
+                                <span id="tomorrowActiveCountBadge" class="font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[10px]">-- نفر</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: Daily Schedule (برنامه روزانه فردا) -->
+            <div id="tab-daily" class="hidden space-y-4">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                        <div>
+                            <h3 class="font-bold text-sm text-slate-800">📅 برنامه حضور نیروهای فعال برای روز <span id="dailyScheduleDayTitle" class="text-amber-600">...</span></h3>
+                            <p class="text-[10px] text-slate-500">لیست پرسنل حاضر به کار به تفکیک بخش‌ها</p>
+                        </div>
+                        <span class="bg-amber-100 text-amber-800 text-[10px] px-2.5 py-1 rounded-full font-bold">برنامه روزانه فردا</span>
+                    </div>
+                    <div id="dailyScheduleContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: Personnel List with Edit feature -->
+            <div id="tab-personnel" class="hidden space-y-4">
+                <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-sm text-slate-800">ساختار کامل پرسنل سالن (قابل ویرایش)</h3>
+                    <span id="totalPersonnelBadge" class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-bold">-- نفر</span>
+                </div>
+                <div id="personnelSectionsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- TAB 4: Notes -->
+            <div id="tab-notes" class="hidden space-y-4">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <h3 id="noteFormTitle" class="font-bold text-sm text-slate-800 mb-3">ثبت یادداشت جدید مدیریتی</h3>
+                    <form onsubmit="addNote(event)" class="space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">موضوع / عنوان</label>
+                                <input type="text" id="noteTitle" required class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-500 outline-none text-xs" placeholder="مثال: سرویس دستگاه پکر ۲">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">تاریخ</label>
+                                <div class="flex gap-1.5">
+                                    <input type="text" id="noteDate" required class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-500 outline-none text-xs" placeholder="۱۴۰۵/۰۶/۲۶">
+                                    <button type="button" onclick="fillTodayDate()" class="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-2.5 py-2 rounded-lg text-xs font-medium transition whitespace-nowrap" title="درج خودکار تاریخ امروز">📅 تاریخ امروز</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-700 mb-1">متن یادداشت</label>
+                            <textarea id="noteContent" rows="2" required class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-500 outline-none text-xs" placeholder="توضیحات کامل یادداشت..."></textarea>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit" id="noteSubmitBtn" class="bg-amber-600 hover:bg-amber-700 text-white font-medium px-4 py-2 rounded-lg shadow text-xs transition">ثبت و ذخیره یادداشت</button>
+                            <button type="button" id="noteCancelBtn" onclick="cancelEditNote()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium px-4 py-2 rounded-lg text-xs transition">انصراف</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-sm text-slate-800 mb-3">یادداشت‌های ثبت‌شده</h3>
+                    <div id="notesListContainer" class="space-y-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        const defaultPersonnel = [
+            // Packer 1
+            { id: 1, name: "جعفر نگارستانی", role: "مسئول دستگاه ۱", section: "دستگاه پکر ۱", offDay: "یکشنبه" },
+            { id: 2, name: "علی شمس‌الدین", role: "مسئول دستگاه ۱", section: "دستگاه پکر ۱", offDay: "دوشنبه" },
+            { id: 3, name: "میلاد کاکویی", role: "کارگر دستگاه ۱", section: "دستگاه پکر ۱", offDay: "سه‌شنبه" },
+            { id: 4, name: "جاوید کاکویی", role: "کارگر دستگاه ۱", section: "دستگاه پکر ۱", offDay: "پنج‌شنبه" },
+            { id: 5, name: "ابوالفضل عبدالهی", role: "کارگر دستگاه ۱", section: "دستگاه پکر ۱", offDay: "چهارشنبه" },
+            { id: 6, name: "محمد حسین یزدی", role: "کارگر دستگاه ۱", section: "دستگاه پکر ۱", offDay: "سه‌شنبه" },
+            { id: 7, name: "محمد سعید (حسن)", role: "کارگر دستگاه ۱", section: "دستگاه پکر ۱", offDay: "چهارشنبه" },
+            { id: 8, name: "محمد جواد عسکری", role: "جانشین استراحت دستگاه ۱", section: "دستگاه پکر ۱", offDay: "شنبه" },
+
+            // Packer 2
+            { id: 9, name: "رامین پور خوش‌سفر", role: "مسئول دستگاه ۲", section: "دستگاه پکر ۲", offDay: "سه‌شنبه" },
+            { id: 10, name: "مهدی عظیمی", role: "کارگر دستگاه ۲", section: "دستگاه پکر ۲", offDay: "شنبه" },
+            { id: 11, name: "حمید رضا نگارستانی", role: "کارگر دستگاه ۲", section: "دستگاه پکر ۲", offDay: "یکشنبه" },
+            { id: 12, name: "مسلم پور احمدی", role: "کارگر دستگاه ۲", section: "دستگاه پکر ۲", offDay: "پنج‌شنبه" },
+            { id: 13, name: "رضا رضائی", role: "کارگر روزمزد دستگاه ۲", section: "دستگاه پکر ۲", offDay: "چهارشنبه" },
+            { id: 14, name: "عباس سعید", role: "جانشین استراحت دستگاه ۲", section: "دستگاه پکر ۲", offDay: "دوشنبه" },
+
+            // Packer 3
+            { id: 15, name: "میلاد سعید", role: "مسئول دستگاه ۳", section: "دستگاه پکر ۳", offDay: "پنج‌شنبه" },
+            { id: 16, name: "علی محمدی", role: "کارگر دستگاه ۳", section: "دستگاه پکر ۳", offDay: "یکشنبه" },
+            { id: 17, name: "میلاد معاذالهی", role: "کارگر دستگاه ۳", section: "دستگاه پکر ۳", offDay: "دوشنبه" },
+            { id: 18, name: "مهدی قاسمی", role: "کارگر روزمزد دستگاه ۳", section: "دستگاه پکر ۳", offDay: "سه‌شنبه" },
+            { id: 19, name: "امیر حسین شریف‌پور", role: "کارگر روزمزد دستگاه ۳", section: "دستگاه پکر ۳", offDay: "یکشنبه" },
+            { id: 20, name: "حمید سعید (حسن)", role: "جانشین استراحت دستگاه ۳", section: "دستگاه پکر ۳", offDay: "دوشنبه" },
+
+            // Packer 4
+            { id: 21, name: "علی قاسم‌پور", role: "مسئول دستگاه ۴", section: "دستگاه پکر ۴", offDay: "شنبه" },
+            { id: 22, name: "علی معاذالهی", role: "کارگر دستگاه ۴", section: "دستگاه پکر ۴", offDay: "سه‌شنبه" },
+            { id: 23, name: "امید امینی", role: "کارگر روزمزد دستگاه ۴", section: "دستگاه پکر ۴", offDay: "جمعه" },
+            { id: 24, name: "محمد جواد شیخ‌زاده", role: "کارگر دستگاه ۴", section: "دستگاه پکر ۴", offDay: "پنج‌شنبه" },
+            { id: 25, name: "محمد مهدی کامور", role: "کارگر دستگاه ۴", section: "دستگاه پکر ۴", offDay: "چهارشنبه" },
+            { id: 26, name: "مهدی خواجویی", role: "جانشین استراحت دستگاه ۴", section: "دستگاه پکر ۴", offDay: "شنبه" },
+
+            // Scouring (سایش)
+            { id: 27, name: "حسن معمار رابری", role: "نیروی سایش", section: "سایش", offDay: "شنبه" },
+            { id: 28, name: "حسین نصیری‌فر", role: "نیروی سایش", section: "سایش", offDay: "یکشنبه" },
+            { id: 29, name: "رضا سعید", role: "نیروی سایش", section: "سایش", offDay: "دوشنبه" },
+            { id: 30, name: "پژمان سعید", role: "نیروی سایش", section: "سایش", offDay: "سه‌شنبه" },
+            { id: 31, name: "محمدعلی قادری", role: "نیروی سایش", section: "سایش", offDay: "سه‌شنبه" },
+            { id: 32, name: "محمدجواد آپرا", role: "نیروی سایش", section: "سایش", offDay: "چهارشنبه" },
+            { id: 33, name: "نیما سعید", role: "نیروی سایش", section: "سایش", offDay: "پنج‌شنبه" },
+            { id: 34, name: "مسلم سعید", role: "نیروی سایش", section: "سایش", offDay: "جمعه" },
+            { id: 35, name: "محمد سعید (شهریار)", role: "نیروی سایش", section: "سایش", offDay: "جمعه" },
+
+            // Yolk (زرده‌گیری)
+            { id: 36, name: "مصطفی علی‌آبادی", role: "نیروی زرده‌گیری", section: "زرده‌گیری", offDay: "پنج‌شنبه" },
+            { id: 37, name: "مسعود توکلی", role: "نیروی زرده‌گیری", section: "زرده‌گیری", offDay: "دوشنبه" }
+        ];
+
+        let personnelData = JSON.parse(localStorage.getItem('simorgh_personnel')) || defaultPersonnel;
+        const sectionsOrder = ["دستگاه پکر ۱", "دستگاه پکر ۲", "دستگاه پکر ۳", "دستگاه پکر ۴", "سایش", "زرده‌گیری"];
+        const daysOfWeek = ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"];
+        let currentDashboardMode = 'today';
+        let editingNoteId = null;
+        let notes = JSON.parse(localStorage.getItem('simorgh_notes')) || [
+            { id: 1, title: "بازرسی فنی پکرها", date: "۱۴۰۵/۰۶/۲۶", content: "سرویس دوره‌ای تسمه‌ها و موتورهای دستگاه شماره ۲ انجام شد." }
+        ];
+
+        const CORRECT_USER = "amin.se7en92@gmail.com";
+        const CORRECT_PASS = "amin3215878";
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('simorgh_saved_user');
+            const savedPass = localStorage.getItem('simorgh_saved_pass');
+            
+            document.getElementById('username').value = savedUser || CORRECT_USER;
+            document.getElementById('password').value = savedPass || CORRECT_PASS;
+            if(savedUser) {
+                document.getElementById('rememberMe').checked = true;
+            }
+        });
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
+            const remember = document.getElementById('rememberMe').checked;
+
+            if(u === CORRECT_USER && p === CORRECT_PASS) {
+                if(remember) {
+                    localStorage.setItem('simorgh_saved_user', u);
+                    localStorage.setItem('simorgh_saved_pass', p);
+                } else {
+                    localStorage.removeItem('simorgh_saved_user');
+                    localStorage.removeItem('simorgh_saved_pass');
+                }
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+                document.getElementById('appContainer').classList.add('flex');
+                initApp();
+            } else {
+                alert('ایمیل یا رمز عبور اشتباه است!');
+            }
+        }
+
+        function handleLogout() {
+            document.getElementById('appContainer').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-amber-600', 'text-amber-600');
+                btn.classList.add('border-transparent', 'text-slate-500');
+            });
+            document.getElementById('tab-dashboard').classList.add('hidden');
+            document.getElementById('tab-daily').classList.add('hidden');
+            document.getElementById('tab-personnel').classList.add('hidden');
+            document.getElementById('tab-notes').classList.add('hidden');
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            activeBtn.classList.add('border-amber-600', 'text-amber-600');
+            activeBtn.classList.remove('border-transparent', 'text-slate-500');
+        }
+
+        function getPersianDayName(offsetDays = 0) {
+            const now = new Date();
+            now.setDate(now.getDate() + offsetDays);
+            const jsDay = now.getDay();
+            const mapping = { 6: 0, 0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6 };
+            return daysOfWeek[mapping[jsDay]];
+        }
+
+        function fillTodayDate() {
+            try {
+                const parts = new Intl.DateTimeFormat('fa-IR', { calendar: 'persian', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+                let y = '', m = '', d = '';
+                parts.forEach(p => {
+                    if (p.type === 'year') y = p.value;
+                    if (p.type === 'month') m = p.value;
+                    if (p.type === 'day') d = p.value;
+                });
+                document.getElementById('noteDate').value = `${y}/${m}/${d}`;
+            } catch (e) {
+                document.getElementById('noteDate').value = '۱۴۰۵/۰۶/۲۷';
+            }
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('tehranTime').innerText = now.toLocaleTimeString('fa-IR', { timeZone: 'Asia/Tehran' });
+            document.getElementById('currentDate').innerText = new Intl.DateTimeFormat('fa-IR', { dateStyle: 'full', timeZone: 'Asia/Tehran' }).format(now);
+            
+            const tomDay = getPersianDayName(1);
+            document.getElementById('todayLabelName').innerText = getPersianDayName(0);
+            document.getElementById('tomorrowLabelName').innerText = tomDay;
+            document.getElementById('tomorrowDaySubTitle').innerText = tomDay;
+            document.getElementById('tabDayName').innerText = tomDay;
+        }
+        setInterval(updateClock, 1000);
+
+        function initApp() {
+            updateClock();
+            document.getElementById('totalPersonnelBadge').innerText = `کل نیروها: ${personnelData.length} نفر`;
+            renderDashboardView();
+            renderTomorrowSummary();
+            renderDailySchedule();
+            renderPersonnelList();
+            renderNotes();
+        }
+
+        // Edit Personnel Modal Functions
+        function openEditModal(id) {
+            const person = personnelData.find(p => p.id === id);
+            if (!person) return;
+            document.getElementById('editPersonId').value = person.id;
+            document.getElementById('editPersonName').value = person.name;
+            document.getElementById('editPersonSection').value = person.section;
+            document.getElementById('editPersonOffDay').value = person.offDay;
+            document.getElementById('editModal').classList.remove('hidden');
+            document.getElementById('editModal').classList.add('flex');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('flex');
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function savePersonnelEdit(e) {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('editPersonId').value);
+            const newName = document.getElementById('editPersonName').value;
+            const newSection = document.getElementById('editPersonSection').value;
+            const newOffDay = document.getElementById('editPersonOffDay').value;
+
+            personnelData = personnelData.map(p => {
+                if (p.id === id) {
+                    return { ...p, name: newName, section: newSection, offDay: newOffDay };
+                }
+                return p;
+            });
+
+            localStorage.setItem('simorgh_personnel', JSON.stringify(personnelData));
+            closeEditModal();
+            initApp();
+        }
+
+        function renderTomorrowSummary() {
+            const tomDay = getPersianDayName(1);
+            const tomOffs = personnelData.filter(p => p.offDay === tomDay);
+            const activeCount = personnelData.length - tomOffs.length;
+
+            document.getElementById('tomorrowActiveCountBadge').innerText = `${activeCount} نفر`;
+
+            const container = document.getElementById('tomorrowOffSummaryList');
+            container.innerHTML = tomOffs.length === 0 ? 
+                `<div class="p-2 bg-slate-50 rounded-lg border border-slate-200 text-[10px] text-slate-400 text-center">فردا هیچ‌کس آف نیست.</div>` :
+                tomOffs.map(p => `
+                    <div class="p-2 bg-white rounded-lg border border-slate-200 text-xs flex justify-between items-center shadow-sm">
+                        <div>
+                            <div class="font-bold text-slate-800">${p.name}</div>
+                            <div class="text-[10px] text-slate-500">${p.section}</div>
+                        </div>
+                        <span class="text-[9px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded font-medium">آف</span>
+                    </div>
+                `).join('');
+        }
+
+        function renderDailySchedule() {
+            const tomDay = getPersianDayName(1);
+            document.getElementById('dailyScheduleDayTitle').innerText = tomDay;
+            const container = document.getElementById('dailyScheduleContainer');
+            container.innerHTML = '';
+
+            sectionsOrder.forEach(secName => {
+                const members = personnelData.filter(p => p.section === secName);
+                const activeMembers = members.filter(m => m.offDay !== tomDay);
+                
+                const card = document.createElement('div');
+                card.className = 'bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2';
+
+                let html = `
+                    <div class="flex justify-between items-center pb-1.5 border-b border-slate-200">
+                        <h4 class="font-bold text-xs text-slate-800">📌 ${secName}</h4>
+                        <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">${activeMembers.length} حاضر</span>
+                    </div>
+                    <div class="space-y-1.5 max-h-[300px] overflow-y-auto pl-0.5">
+                `;
+
+                if (activeMembers.length === 0) {
+                    html += `<div class="text-[10px] text-slate-400 text-center py-2">نیروی فعالی در این بخش نیست.</div>`;
+                } else {
+                    activeMembers.forEach(m => {
+                        html += `
+                            <div class="p-2 bg-white rounded-lg border border-slate-200 flex justify-between items-center text-xs shadow-sm">
+                                <div>
+                                    <span class="font-bold text-slate-800">${m.name}</span>
+                                    <div class="text-[10px] text-slate-500">${m.role}</div>
+                                </div>
+                                <span class="text-[9px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded font-medium">حاضر</span>
+                            </div>
+                        `;
+                    });
+                }
+
+                html += `</div>`;
+                card.innerHTML = html;
+                container.appendChild(card);
+            });
+        }
+
+        function setDashboardMode(mode) {
+            currentDashboardMode = mode;
+            const btnToday = document.getElementById('modeBtnToday');
+            const btnTomorrow = document.getElementById('modeBtnTomorrow');
+
+            if(mode === 'today') {
+                btnToday.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition bg-amber-600 text-white shadow-sm";
+                btnTomorrow.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200";
+            } else {
+                btnTomorrow.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition bg-amber-600 text-white shadow-sm";
+                btnToday.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200";
+            }
+            renderDashboardView();
+        }
+
+        function renderDashboardView() {
+            const targetDay = currentDashboardMode === 'today' ? getPersianDayName(0) : getPersianDayName(1);
+            
+            document.getElementById('activeModeTitle').innerText = currentDashboardMode === 'today' ? 'امروز' : 'فردا';
+            document.getElementById('activeDayNameTitle').innerText = targetDay;
+
+            const container = document.getElementById('offPersonnelList');
+            container.innerHTML = '';
+
+            const offPeople = personnelData.filter(p => p.offDay === targetDay);
+            document.getElementById('offCountBadge').innerText = `${offPeople.length} نفر`;
+
+            if(offPeople.length === 0) {
+                container.innerHTML = `<div class="p-3 text-center text-slate-400 text-xs bg-slate-50 rounded-lg">هیچ پرسنلی در این روز آف نیست.</div>`;
+                return;
+            }
+
+            container.innerHTML = offPeople.map(p => {
+                let isBackup = p.role.includes('جانشین');
+                return `
+                    <div class="p-2.5 bg-white rounded-lg border border-slate-200 hover:border-amber-300 transition text-xs flex justify-between items-center shadow-sm">
+                        <div>
+                            <div class="font-bold text-slate-800">${p.name}</div>
+                            <div class="text-[10px] text-slate-500">${p.section} - <span class="text-amber-600">${p.role}</span></div>
+                        </div>
+                        <span class="text-[9px] ${isBackup ? 'bg-amber-100 text-amber-700' : 'bg-amber-50 text-amber-700 border border-amber-200'} px-2 py-0.5 rounded font-medium">${isBackup ? 'جانشین شیفت' : 'آف شیفت'}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPersonnelList() {
+            const container = document.getElementById('personnelSectionsContainer');
+            container.innerHTML = '';
+
+            sectionsOrder.forEach(secName => {
+                const members = personnelData.filter(p => p.section === secName);
+                const card = document.createElement('div');
+                card.className = 'bg-white p-3 rounded-xl shadow-sm border border-slate-200 space-y-2';
+
+                let html = `<div class="flex justify-between items-center pb-1.5 border-b border-slate-100"><h4 class="font-bold text-xs text-slate-800">${secName}</h4><span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">${members.length} نفر</span></div><div class="space-y-1.5 max-h-[300px] overflow-y-auto pl-0.5">`;
+
+                members.forEach(m => {
+                    html += `
+                        <div class="p-2 bg-slate-50 rounded-lg border border-slate-200 flex justify-between items-center text-xs">
+                            <div>
+                                <span class="font-bold text-slate-800">${m.name}</span>
+                                <div class="text-[10px] text-slate-500">${m.role}</div>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[9px] bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded border border-amber-200 font-medium">آف: ${m.offDay}</span>
+                                <button onclick="openEditModal(${m.id})" class="text-[10px] bg-white hover:bg-amber-50 text-amber-600 px-2 py-0.5 rounded border border-slate-200 transition font-medium">ویرایش</button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                card.innerHTML = html;
+                container.appendChild(card);
+            });
+        }
+
+        function addNote(e) {
+            e.preventDefault();
+            const title = document.getElementById('noteTitle').value;
+            const date = document.getElementById('noteDate').value;
+            const content = document.getElementById('noteContent').value;
+
+            if (editingNoteId !== null) {
+                notes = notes.map(n => n.id === editingNoteId ? { ...n, title, date, content } : n);
+                cancelEditNote();
+            } else {
+                notes.unshift({ id: Date.now(), title, date, content });
+                document.getElementById('noteTitle').value = '';
+                document.getElementById('noteDate').value = '';
+                document.getElementById('noteContent').value = '';
+            }
+
+            localStorage.setItem('simorgh_notes', JSON.stringify(notes));
+            renderNotes();
+        }
+
+        function editNote(id) {
+            const note = notes.find(n => n.id === id);
+            if (note) {
+                document.getElementById('noteTitle').value = note.title;
+                document.getElementById('noteDate').value = note.date;
+                document.getElementById('noteContent').value = note.content;
+                editingNoteId = id;
+                document.getElementById('noteFormTitle').innerText = 'ویرایش یادداشت مدیریتی';
+                document.getElementById('noteSubmitBtn').innerText = 'ویرایش و ذخیره';
+                document.getElementById('noteCancelBtn').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function cancelEditNote() {
+            editingNoteId = null;
+            document.getElementById('noteTitle').value = '';
+            document.getElementById('noteDate').value = '';
+            document.getElementById('noteContent').value = '';
+            document.getElementById('noteFormTitle').innerText = 'ثبت یادداشت جدید مدیریتی';
+            document.getElementById('noteSubmitBtn').innerText = 'ثبت و ذخیره یادداشت';
+            document.getElementById('noteCancelBtn').classList.add('hidden');
+        }
+
+        function deleteNote(id) {
+            notes = notes.filter(n => n.id !== id);
+            localStorage.setItem('simorgh_notes', JSON.stringify(notes));
+            renderNotes();
+        }
+
+        function renderNotes() {
+            const container = document.getElementById('notesListContainer');
+            container.innerHTML = '';
+
+            if(notes.length === 0) {
+                container.innerHTML = `<div class="p-3 text-center text-slate-400 text-xs bg-slate-50 rounded-lg">هیچ یادداشتی ثبت نشده است.</div>`;
+                return;
+            }
+
+            notes.forEach(n => {
+                const div = document.createElement('div');
+                div.className = 'p-3 bg-slate-50 rounded-lg border border-slate-200 flex justify-between items-start gap-3 text-xs';
+                div.innerHTML = `
+                    <div>
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <h4 class="font-bold text-slate-800">${n.title}</h4>
+                            <span class="text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-mono">${n.date}</span>
+                        </div>
+                        <p class="text-slate-600 text-[11px]">${n.content}</p>
+                    </div>
+                    <div class="flex gap-1">
+                        <button onclick="editNote(${n.id})" class="text-amber-600 hover:text-amber-800 text-xs font-medium px-2 py-0.5 rounded bg-amber-50 border border-amber-200 transition">ویرایش</button>
+                        <button onclick="deleteNote(${n.id})" class="text-rose-500 hover:text-rose-700 text-xs font-medium px-2 py-0.5 rounded bg-rose-50 border border-rose-200 transition">حذف</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+    </script>
+</body>
+</html>
